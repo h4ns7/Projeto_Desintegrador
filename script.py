@@ -165,7 +165,7 @@ def atualizacurso():
 
 
 
-def todos():
+def todosalunos():
 
     global indice
     global lista
@@ -209,6 +209,27 @@ def todosinstrutor():
     # sg.popup('Quantidade de registros: ' + str(len(resposta)))
     indice = 0
     atualizainstrutor()
+
+
+def todoscurso():
+
+    global indice
+    global lista
+    resposta = []
+    with con:
+        with con.cursor() as cursor:
+            cursor.execute("SELECT * FROM CURSO;")
+            resposta = cursor.fetchall()
+    lista.clear()
+    listaString = ''
+    for i in range(len(resposta)):
+        lista.append( list(resposta[i]) )
+        listaString += str(i+1) +') ' + resposta[i][1] + '\n'
+    sg.popup('Resultado:\n\n' + listaString)
+    # sg.popup('Quantidade de registros: ' + str(len(resposta)))
+    indice = 0
+    atualizacurso()
+
 
 
 
@@ -414,11 +435,21 @@ while True:
                     lista.append( list(resposta[i]) )
                     lista[i][4] = True if lista[i][4] == 'M' else False
                     listaString += str(i+1) +') ' + resposta[i][1] + '\n'
+
+                sg.Table(values=resposta,headings=['COD','Valor','Dt Pago','Dt Vence','Status','COD Aluno','COD Matricula'], max_col_width=35,
+                           auto_size_columns=True,
+                           justification='center',
+                           num_rows=22,
+                           enable_events=True,
+                           key='PROCURAR_ALUNO',
+                           row_height=19,
+                           tooltip=''),sg.Push(),
+                sg.Push(),sg.Text('Menu Mensalidade', font=("Comic Sans", 14)),sg.Push()
                 sg.popup('Resultado:\n\n' + listaString)
                 indice = 0
                 atualizaaluno()
     elif event == "-TODOS_ALUNO-":
-        todos()
+        todosalunos()
     elif event == "->>-":
         indice += 1
         if indice >= len(lista): indice = len(lista)-1
@@ -508,20 +539,19 @@ while True:
     elif event == "-PROCURAR_CURSO-":
         with con:
             with con.cursor() as cursor:
-                cursor.execute("SELECT * FROM CURSO WHERE nome LIKE %s;",
+                cursor.execute("SELECT * FROM CURSO WHERE NOME_CURSO LIKE %s;",
                     ('%'+values['-NOMECURSO-']+'%',))
                 resposta = cursor.fetchall()
                 lista.clear()
                 listaString = ''
                 for i in range(len(resposta)):
                     lista.append( list(resposta[i]) )
-                    lista[i][4] = True if lista[i][4] == 'M' else False
                     listaString += str(i+1) +') ' + resposta[i][1] + '\n'
                 sg.popup('Resultado:\n\n' + listaString)
                 indice = 0
                 atualizacurso()
     elif event == "-TODOS_CURSO-":
-        todos()
+        todoscurso()
     elif event == "->>-":
         indice += 1
         if indice >= len(lista): indice = len(lista)-1
